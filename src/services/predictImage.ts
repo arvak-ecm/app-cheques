@@ -1,4 +1,5 @@
-const host_predict = "http://127.0.0.1:5000/predict";
+//const host_predict = "http://127.0.0.1:5000/predict";
+const host_predict = "https://api-cheque-cl-rw3fmfrljq-uc.a.run.app/predict";
 
 export const predictImage = async (data: { file: File; threshold: number }) => {
   const formData = new FormData();
