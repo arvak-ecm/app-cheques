@@ -5,7 +5,7 @@ interface viewImageProps {
   labels: string[];
   scores: number[];
   threshold: number;
-  image: File;
+  image: File | null;
 }
 const ViewImage: FC<viewImageProps> = ({
   boxes,
@@ -61,7 +61,7 @@ const ViewImage: FC<viewImageProps> = ({
         };
         img.src = event.target!.result as string;
       };
-      reader.readAsDataURL(image);
+      reader.readAsDataURL(image!);
     }
   }, [boxes, labels, scores, image, threshold]);
 
