@@ -61,7 +61,6 @@ function App() {
           <Threshold onThreshold={handleThreshold} />
           <Toast
             msg="Upps!!! ha ocurrido un errror en el servicio"
-            typeMsg="error"
             trigger={errorService}
           />
         </div>

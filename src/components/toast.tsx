@@ -2,11 +2,11 @@ import { FC, useRef } from "react";
 import { CSSTransition } from "react-transition-group";
 interface toasProps {
   msg: string;
-  typeMsg: "success" | "error";
+  //typeMsg: "success" | "error";
   trigger: boolean;
 }
 
-const Toast: FC<toasProps> = ({ msg, typeMsg, trigger }) => {
+const Toast: FC<toasProps> = ({ msg, trigger }) => {
   const nodeRef = useRef(null);
   return (
     <>
