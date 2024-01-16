@@ -41,6 +41,7 @@ const ViewImage: FC<viewImageProps> = ({
           );
           for (let i = 0; i < scores.length; i++) {
             if (scores[i] >= threshold) {
+              console.log(labels[i], i);
               const label = labels[i];
               const score = scores[i].toFixed(2);
               const [xmin, ymin, xmax, ymax] = boxes[i];

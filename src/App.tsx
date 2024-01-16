@@ -3,6 +3,7 @@ import "./App.css";
 import NewImagen from "./components/newImagen";
 import Spinner from "./components/spinner";
 import Threshold from "./components/threshold";
+import Toast from "./components/toast";
 import UploadFile from "./components/uploadFile";
 import ViewImage from "./components/viewImage";
 import { predictImage } from "./services/predictImage";
@@ -25,7 +26,6 @@ function App() {
           setBoxes(data.boxes);
           setLabels(data.labels);
           setScores(data.scores);
-          console.log("Archivo subido con éxito:", data);
           setService(true);
           setTimeout(() => {
             setSpinner(false);
@@ -33,13 +33,12 @@ function App() {
         })
         .catch((error) => {
           setService(false);
+          setSpinner(false);
           setErrorService(true);
           setTimeout(() => {
             setErrorService(false);
           }, 3000);
-          setTimeout(() => {
-            setSpinner(false);
-          }, 500);
+
           console.error("Error al subir el archivo:", error);
         });
     }
@@ -52,18 +51,19 @@ function App() {
   const handleFile = (uploadedFile: File | null) => {
     setFile(uploadedFile);
   };
+
   return (
     <>
-      {spinner && <Spinner />}
+      <Spinner trigger={spinner} />
       {!service ? (
         <div id="uploadFile" className="flex flex-col gap-4">
           <UploadFile onFileUpload={handleFile} />
           <Threshold onThreshold={handleThreshold} />
-          {errorService && (
-            <div className="text-white font-bold text-[15px] bg-red-600 border p-4 rounded-md transition  ease-in-out duration-300">
-              <p>Upps!!! ha ocurrido un errror en el servicio</p>
-            </div>
-          )}
+          <Toast
+            msg="Upps!!! ha ocurrido un errror en el servicio"
+            typeMsg="error"
+            trigger={errorService}
+          />
         </div>
       ) : (
         <div className="container">
