@@ -1,18 +1,16 @@
-import { FC, useRef } from "react";
+import { FC, useContext, useRef } from "react";
 import { CSSTransition } from "react-transition-group";
+import { AppContext } from "../context/appContext";
 import "./spinner.css";
 
-interface spinnerProps {
-  trigger: boolean;
-}
-
-const Spinner: FC<spinnerProps> = ({ trigger }) => {
+const Spinner: FC = () => {
+  const { appData } = useContext(AppContext);
   const nodeRef = useRef(null);
   return (
     <>
       <CSSTransition
         nodeRef={nodeRef}
-        in={trigger}
+        in={appData.showSpinner}
         timeout={500}
         classNames="fade"
         unmountOnExit

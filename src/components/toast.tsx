@@ -1,4 +1,4 @@
-import { FC, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { CSSTransition } from "react-transition-group";
 interface toasProps {
   msg: string;
@@ -7,12 +7,20 @@ interface toasProps {
 }
 
 const Toast: FC<toasProps> = ({ msg, trigger }) => {
+  const [triggerr, setTriggerr] = useState(trigger);
   const nodeRef = useRef(null);
+  useEffect(() => {
+    if (trigger === false) return;
+    setTimeout(() => {
+      console.log("trigger");
+      setTriggerr(false);
+    }, 3000);
+  }, [trigger]);
   return (
     <>
       <CSSTransition
         nodeRef={nodeRef}
-        in={trigger}
+        in={triggerr}
         timeout={500}
         classNames="fade"
         unmountOnExit

@@ -1,6 +1,19 @@
+import axios from "axios";
 //const host_predict = "http://127.0.0.1:5000/predict";
 const host_predict = "https://api-cheque-cl-rw3fmfrljq-uc.a.run.app/predict";
 
+export const predictImage = (data: { file: File; threshold: number }) => {
+  const formData = new FormData();
+  formData.append("file", data.file);
+  formData.append("threshold", `${data.threshold}`);
+  return axios.post(host_predict, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+/*
 export const predictImage = async (data: { file: File; threshold: number }) => {
   const formData = new FormData();
   formData.append("file", data.file);
@@ -18,4 +31,4 @@ export const predictImage = async (data: { file: File; threshold: number }) => {
     console.error("Error al realizar la solicitud:", error);
     throw error;
   }
-};
+};*/

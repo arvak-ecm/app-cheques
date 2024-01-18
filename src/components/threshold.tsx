@@ -1,16 +1,13 @@
-import { FC, useRef, useState } from "react";
+import { FC, useContext, useRef } from "react";
+import { AppContext } from "../context/appContext";
 
-interface thresholdProps {
-  onThreshold: (value: number) => void;
-}
-
-const Threshold: FC<thresholdProps> = ({ onThreshold }) => {
-  const [threshold, setThreshold] = useState(7);
+const Threshold: FC = () => {
+  const { appData, updateAppData } = useContext(AppContext);
   const fileinputRef = useRef<HTMLInputElement>(null);
 
   const changeThreshold = (threshold: number) => {
-    setThreshold(threshold);
-    onThreshold(threshold);
+    updateAppData({ threshold });
+    console.log("threshold", appData);
   };
 
   return (
@@ -23,12 +20,12 @@ const Threshold: FC<thresholdProps> = ({ onThreshold }) => {
             type="range"
             min="1"
             max="9"
-            value={threshold}
+            value={appData.threshold}
             className="range-slider"
             id="myRange"
             onChange={(e) => changeThreshold(Number(e.target.value))}
           />
-          <p className="range-slidervalue">{threshold / 10}</p>
+          <p className="range-slidervalue">{appData.threshold / 10}</p>
         </div>
       </div>
     </>

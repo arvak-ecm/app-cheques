@@ -1,14 +1,20 @@
-import { useEffect, useState } from "react";
+import { Outlet } from "react-router-dom";
 import "./App.css";
-import NewImagen from "./components/newImagen";
 import Spinner from "./components/spinner";
-import Threshold from "./components/threshold";
-import Toast from "./components/toast";
-import UploadFile from "./components/uploadFile";
-import ViewImage from "./components/viewImage";
-import { predictImage } from "./services/predictImage";
+import { AppProvider } from "./context/appContext";
 
 function App() {
+  return (
+    <>
+      <AppProvider>
+        <Spinner />
+        <Outlet />
+      </AppProvider>
+    </>
+  );
+}
+/*
+function App2() {
   const [file, setFile] = useState<File | null>(null);
   const [errorService, setErrorService] = useState(false);
   const [service, setService] = useState(false);
@@ -80,6 +86,6 @@ function App() {
       )}
     </>
   );
-}
+}*/
 
 export default App;
