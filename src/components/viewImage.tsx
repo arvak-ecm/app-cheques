@@ -77,40 +77,55 @@ const ViewImage: FC<ViewImageProps> = ({ boxes, labels, scores, image, threshold
 
         // Aserción de tipo para asegurar que e.target y e.target.result no son null
 
-  const handleClick = (event: MouseEvent): void => {
-    if (canvasRef.current) {
-      const rect = canvasRef.current.getBoundingClientRect();
-      const scaleX = canvasRef.current.width / rect.width;
-      const scaleY = canvasRef.current.height / rect.height;
-      const x = (event.clientX - rect.left) * scaleX;
-      const y = (event.clientY - rect.top) * scaleY;
-
-      const clickedBoxIndex = boxes.findIndex(box => 
-        x >= box[0] && x <= box[2] && y >= box[1] && y <= box[3]
-      );
-
-      if (clickedBoxIndex !== -1) {
-        const boxImage = extractBoxImage(boxes[clickedBoxIndex]);
-        setSelectedBoxContent({ 
-          label: labels[clickedBoxIndex], 
-          score: scores[clickedBoxIndex],
-          image: boxImage 
-        });
-        setIsModalOpen(true);
-      }
-    }
-  };
+        const handleClick = (event: MouseEvent): void => {
+          if (!canvasRef.current || !imageRef.current) return;
+        
+          const rect = canvasRef.current.getBoundingClientRect();
+          const canvasScaleX = canvasRef.current.width / rect.width;
+          const canvasScaleY = canvasRef.current.height / rect.height;
+          
+          const x = (event.clientX - rect.left) * canvasScaleX;
+          const y = (event.clientY - rect.top) * canvasScaleY;
+          
+          const clickedBoxIndex = boxes.findIndex(box => 
+            x >= box[0] && x <= box[2] && y >= box[1] && y <= box[3]
+          );
+        
+          if (clickedBoxIndex === -1) return;
+        
+          const originalBox = boxes[clickedBoxIndex];
+        
+          const imageScaleX = imageRef.current.naturalWidth / canvasRef.current.width;
+          const imageScaleY = imageRef.current.naturalHeight / canvasRef.current.height;
+        
+          const adjustedBox = originalBox.map((value, index) => 
+            index % 2 === 0 ? value * imageScaleX : value * imageScaleY
+          );
+        
+          const boxImage = extractBoxImage(adjustedBox);
+          setSelectedBoxContent({ 
+            label: labels[clickedBoxIndex], 
+            score: scores[clickedBoxIndex],
+            image: boxImage 
+          });
+          setIsModalOpen(true);
+        };
 
   const extractBoxImage = (box: number[]): string => {
     const tempCanvas = document.createElement('canvas');
     const ctx = tempCanvas.getContext('2d');
-    const width = box[2] - box[0];
-    const height = box[3] - box[1];
+  
+    const x = box[0];
+    const y = box[1];
+    const width = box[2] - x;
+    const height = box[3] - y;
+    
+  
     tempCanvas.width = width;
     tempCanvas.height = height;
   
     if (imageRef.current.complete && imageRef.current.naturalWidth !== 0) {
-      ctx?.drawImage(imageRef.current, box[0], box[1], width, height, 0, 0, width, height);
+      ctx?.drawImage(imageRef.current, x, y, width, height, 0, 0, width, height);
       return tempCanvas.toDataURL();
     }
   
