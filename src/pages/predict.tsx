@@ -6,12 +6,14 @@ import Toast from "../components/toast";
 import ViewImage from "../components/viewImage";
 import { AppContext } from "../context/appContext";
 import { predictImage } from "../services/predictImage";
+import responsePredictProps from "../types/responsePredictProps";
 interface predictProps {}
+
 const Predict: FC<predictProps> = () => {
   const [errorService, setErrorService] = useState(false);
-  const [boxes, setBoxes] = useState<[][]>([]);
-  const [labels, setLabels] = useState<[]>([]);
-  const [scores, setScores] = useState<[]>([]);
+  const [dataService, setDataService] = useState<responsePredictProps>(
+    {} as responsePredictProps
+  );
   const { appData, updateAppData } = useContext(AppContext);
 
   const location = useLocation();
@@ -29,11 +31,9 @@ const Predict: FC<predictProps> = () => {
       try {
         updateAppData({ showSpinner: true });
         const response = await predictImage({ file, threshold });
-        const { boxes, labels, scores } = response.data;
-        setBoxes(boxes);
-        setLabels(labels);
-        setScores(scores);
-        console.log(response.data);
+        const { boxes, labels, scores, image_width, image_height } =
+          response.data;
+        setDataService({ boxes, labels, scores, image_width, image_height });
         updateAppData({ showSpinner: false });
       } catch (error) {
         setErrorService(true);
@@ -49,11 +49,8 @@ const Predict: FC<predictProps> = () => {
           <BtnNew />
           <BtnReload />
         </div>
-
         <ViewImage
-          boxes={boxes}
-          labels={labels}
-          scores={scores}
+          service={dataService}
           image={location.state.uploadedFile}
           threshold={appData.threshold}
         />

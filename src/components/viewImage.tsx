@@ -1,30 +1,30 @@
 import { FC, useEffect, useRef, useState } from "react";
 import Modal from "react-modal";
+import responsePredictProps from "../types/responsePredictProps";
 import getRandomRgbColor from "../utils/utils";
+
+interface modalProps {
+  image: string;
+  label: string;
+  score: string;
+  width: number;
+  height: number;
+}
+
 interface viewImageProps {
-  boxes: number[][];
-  labels: string[];
-  scores: number[];
+  service: responsePredictProps;
   threshold: number;
   image: File | null;
 }
 const ViewImage: FC<viewImageProps> = ({
-  boxes,
-  labels,
-  scores,
+  service: { boxes, labels, scores, image_width, image_height },
   image,
   threshold,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(new Image(1236, 540));
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [dataModal, setDataModal] = useState({
-    image: "",
-    label: "",
-    score: "",
-    width: 0,
-    height: 0,
-  });
+  const [dataModal, setDataModal] = useState({} as modalProps);
 
   const closeModal = () => {
     setModalIsOpen(false);
@@ -52,24 +52,14 @@ const ViewImage: FC<viewImageProps> = ({
   const getImageBox = (box: number[]) => {
     const [xmin, ymin, xmax, ymax] = box;
     const canvasImage = imageRef.current!;
-    canvasImage.width = 1236;
-    canvasImage.height = 540;
+    canvasImage.width = image_width;
+    canvasImage.height = image_height;
     const canvas = document.createElement("canvas");
     const width = xmax - xmin;
     const height = ymax - ymin;
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext("2d");
-
-    console.log({
-      canvasImage_w: canvasImage.width,
-      canvasImage_h: canvasImage.height,
-      canvasImageW: canvasImage.naturalWidth,
-      canvasImageH: canvasImage.naturalHeight,
-      canvasRefW: canvasRef.current!.width,
-      canvasRefH: canvasRef.current!.height,
-    });
-
     ctx?.drawImage(canvasImage, xmin, ymin, width, height, 0, 0, width, height);
     return canvas.toDataURL();
   };
@@ -89,15 +79,15 @@ const ViewImage: FC<viewImageProps> = ({
         image,
         label: labels[boxId],
         score: scores[boxId].toFixed(2),
-        width: (boxes[boxId][2] - boxes[boxId][0]).toFixed(1),
-        height: (boxes[boxId][3] - boxes[boxId][1]).toFixed(1),
+        width: boxes[boxId][2] - boxes[boxId][0],
+        height: boxes[boxId][3] - boxes[boxId][1],
       });
       setModalIsOpen(true);
     }
   };
 
   const getBoxIndex = (x: number, y: number) => {
-    return boxes.findIndex(
+    return boxes?.findIndex(
       (box) => x >= box[0] && x <= box[2] && y >= box[1] && y <= box[3]
     );
   };
@@ -105,16 +95,12 @@ const ViewImage: FC<viewImageProps> = ({
   useEffect(() => {
     if (canvasRef.current) {
       const ctx = canvasRef.current.getContext("2d");
-      canvasRef.current.width = 1236;
-      canvasRef.current.height = 540;
-      imageRef.current.width = 1236;
-      imageRef.current.height = 540;
+      canvasRef.current.width = image_width;
+      canvasRef.current.height = image_height;
       canvasRef.current!.addEventListener("click", handleCanvasClick);
       const reader = new FileReader();
       reader.onload = function (event) {
         const img = new Image();
-        img.width = 1236;
-        img.height = 540;
         img.onload = function () {
           imageRef.current = img;
           ctx!.drawImage(
@@ -124,7 +110,7 @@ const ViewImage: FC<viewImageProps> = ({
             canvasRef.current!.width,
             canvasRef.current!.height
           );
-          for (let i = 0; i < scores.length; i++) {
+          for (let i = 0; i < scores?.length; i++) {
             if (scores[i] >= threshold / 10) {
               const label = labels[i];
               const score = scores[i].toFixed(2);
@@ -153,7 +139,6 @@ const ViewImage: FC<viewImageProps> = ({
             <h2>etiqueta: {dataModal.label}</h2>
             <h2>score: {dataModal.score}</h2>
             <h2>valor: Coming Soon!!!!!</h2>
-            <h2>ancho: {dataModal.width}</h2>
           </div>
 
           <img
@@ -172,7 +157,7 @@ const ViewImage: FC<viewImageProps> = ({
           <div className="w-full border border-cyan-600 p-5 rounded-lg bg-gray-100">
             <h2 className="font-bold">Scores</h2>
             <ul className="text-left">
-              {labels.map((label, index) => {
+              {labels?.map((label, index) => {
                 const score = scores[index];
                 return (
                   <li key={index}>
