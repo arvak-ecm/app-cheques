@@ -6,6 +6,9 @@ import ErrorPage from "./pages/errorPage.tsx";
 import Home from "./pages/home.tsx";
 import Predict from "./pages/predict.tsx";
 import { AxiosInterceptor } from "./services/axios.interceptor.tsx";
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root')
 
 const router = createBrowserRouter([
   {
@@ -27,5 +30,6 @@ const router = createBrowserRouter([
 ]);
 AxiosInterceptor();
 ReactDOM.createRoot(document.getElementById("root")!).render(
+
   <RouterProvider router={router} />
 );

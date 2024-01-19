@@ -33,7 +33,6 @@ const Predict: FC<predictProps> = () => {
         setBoxes(boxes);
         setLabels(labels);
         setScores(scores);
-        console.log(response.data);
         updateAppData({ showSpinner: false });
       } catch (error) {
         setErrorService(true);
@@ -45,7 +44,7 @@ const Predict: FC<predictProps> = () => {
   return (
     <>
       <div className="container flex flex-col justify-start">
-        <div className="flex flex-row justify-between px-4 ">
+        <div className="flex flex-row justify-between pb-2">
           <BtnNew />
           <BtnReload />
         </div>

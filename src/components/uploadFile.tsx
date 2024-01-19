@@ -42,6 +42,11 @@ const UploadFile: FC<uploadFileProps> = ({ onFileUpload }) => {
 
   return (
     <>
+      <div className='relative w-[400px] h-[300px]'>
+      <div className='absolute top-0 flex justify-center w-full'>
+        <div className='left-0 h-[1px] animate-border-width rounded-full  bg-gradient-to-r from-[rgba(17,17,17,0)] via-white to-[rgba(17,17,17,0)] transition-all duration-1000' />
+      </div>
+        <div className='flex items-center justify-center h-full px-3 py-2 bg-[#040b03] border border-dashed rounded-md'>
       <label
         ref={labelRef}
         className="custum-file-upload"
@@ -53,11 +58,13 @@ const UploadFile: FC<uploadFileProps> = ({ onFileUpload }) => {
           <img
             alt="icon-upload"
             className="icon-upload"
-            src="assets/photo-up.png"
+            src="assets/image-plus.png"
           />
         </div>
-        <div className="text">
-          <span>Arrastre la imagen o Click para cargar</span>
+        <div >
+        <span className='inline-flex animate-background-shine bg-[#f3fff1] bg-[length:250%_100%] bg-clip-text text-xl text-transparent'>
+            Arrastre la imagen o click para cargar
+        </span>
         </div>
         <input
           accept="image/jpeg"
@@ -66,7 +73,10 @@ const UploadFile: FC<uploadFileProps> = ({ onFileUpload }) => {
           ref={fileinputRef}
           onChange={onFileSelect}
         />
-      </label>
+      </label> 
+      </div>
+    </div>
+      
     </>
   );
 };

@@ -12,7 +12,7 @@ const Threshold: FC = () => {
 
   return (
     <>
-      <div className="range-slider-div flex flex-col ">
+      <div className="range-slider-div flex flex-col bg-[#040b03] ">
         <p className="text-[14px] text-left">Índice de confianza (threshold)</p>
         <div className="flex flex-row items-center gap-3">
           <input

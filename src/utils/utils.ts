@@ -1,4 +1,4 @@
-const getRandomRgbColor = (a = 1) => {
+const getRandomRgbColor = (a: number = 1) => {
   // Número aleatorio entre 0 y 255 para rojo
   const red = Math.floor(Math.random() * 256);
   // Número aleatorio entre 0 y 255 para verde
