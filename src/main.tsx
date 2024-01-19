@@ -1,4 +1,5 @@
 import ReactDOM from "react-dom/client";
+import Modal from "react-modal";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App.tsx";
 import "./index.css";
@@ -6,6 +7,7 @@ import ErrorPage from "./pages/errorPage.tsx";
 import Home from "./pages/home.tsx";
 import Predict from "./pages/predict.tsx";
 import { AxiosInterceptor } from "./services/axios.interceptor.tsx";
+Modal.setAppElement("#root");
 
 const router = createBrowserRouter([
   {

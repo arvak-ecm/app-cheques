@@ -1,4 +1,5 @@
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
+import Modal from "react-modal";
 import getRandomRgbColor from "../utils/utils";
 interface viewImageProps {
   boxes: number[][];
@@ -15,24 +16,107 @@ const ViewImage: FC<viewImageProps> = ({
   threshold,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const drawBox = (ctx: CanvasRenderingContext2D, box: number[]) => {
-    const color = getRandomRgbColor();
-    const [xmin, ymin, xmax, ymax] = box;
-    ctx.lineWidth = 4;
-    ctx.strokeRect(xmin, ymin, xmax - xmin, ymax - ymin);
-    ctx.fillStyle = color.replace("1)", "0.3)");
-    ctx.fillRect(xmin, ymin, xmax - xmin, ymax - ymin);
+  const imageRef = useRef<HTMLImageElement>(new Image(1236, 540));
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [dataModal, setDataModal] = useState({
+    image: "",
+    label: "",
+    score: "",
+    width: 0,
+    height: 0,
+  });
+
+  const closeModal = () => {
+    setModalIsOpen(false);
   };
+
+  const drawBox = (
+    ctx: CanvasRenderingContext2D,
+    box: number[],
+    label: string,
+    score: string
+  ) => {
+    const color = getRandomRgbColor(0.6);
+    const [xmin, ymin, xmax, ymax] = box;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(xmin, ymin, xmax - xmin, ymax - ymin);
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color.replace("0.6", "0.3");
+    ctx.fillRect(xmin, ymin, xmax - xmin, ymax - ymin);
+
+    ctx.fillStyle = "black"; // Color del texto
+    ctx.font = "16px Arial"; // Tamaño y fuente del texto
+    ctx.fillText(`${label}: ${score}`, xmin, ymin - 5);
+  };
+
+  const getImageBox = (box: number[]) => {
+    const [xmin, ymin, xmax, ymax] = box;
+    const canvasImage = imageRef.current!;
+    canvasImage.width = 1236;
+    canvasImage.height = 540;
+    const canvas = document.createElement("canvas");
+    const width = xmax - xmin;
+    const height = ymax - ymin;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+
+    console.log({
+      canvasImage_w: canvasImage.width,
+      canvasImage_h: canvasImage.height,
+      canvasImageW: canvasImage.naturalWidth,
+      canvasImageH: canvasImage.naturalHeight,
+      canvasRefW: canvasRef.current!.width,
+      canvasRefH: canvasRef.current!.height,
+    });
+
+    ctx?.drawImage(canvasImage, xmin, ymin, width, height, 0, 0, width, height);
+    return canvas.toDataURL();
+  };
+
+  const handleCanvasClick = (event: { clientX: number; clientY: number }) => {
+    if (!canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const scaleX = canvasRef.current.width / rect.width;
+    const scaleY = canvasRef.current.height / rect.height;
+    const x = (event.clientX - rect.left) * scaleX;
+    const y = (event.clientY - rect.top) * scaleY;
+
+    const boxId = getBoxIndex(x, y);
+    if (boxId !== -1) {
+      const image = getImageBox(boxes[boxId]);
+      setDataModal({
+        image,
+        label: labels[boxId],
+        score: scores[boxId].toFixed(2),
+        width: (boxes[boxId][2] - boxes[boxId][0]).toFixed(1),
+        height: (boxes[boxId][3] - boxes[boxId][1]).toFixed(1),
+      });
+      setModalIsOpen(true);
+    }
+  };
+
+  const getBoxIndex = (x: number, y: number) => {
+    return boxes.findIndex(
+      (box) => x >= box[0] && x <= box[2] && y >= box[1] && y <= box[3]
+    );
+  };
+
   useEffect(() => {
     if (canvasRef.current) {
       const ctx = canvasRef.current.getContext("2d");
       canvasRef.current.width = 1236;
       canvasRef.current.height = 540;
-
+      imageRef.current.width = 1236;
+      imageRef.current.height = 540;
+      canvasRef.current!.addEventListener("click", handleCanvasClick);
       const reader = new FileReader();
       reader.onload = function (event) {
         const img = new Image();
+        img.width = 1236;
+        img.height = 540;
         img.onload = function () {
+          imageRef.current = img;
           ctx!.drawImage(
             img,
             0,
@@ -44,13 +128,8 @@ const ViewImage: FC<viewImageProps> = ({
             if (scores[i] >= threshold / 10) {
               const label = labels[i];
               const score = scores[i].toFixed(2);
-              const [xmin, ymin] = boxes[i];
               if (ctx) {
-                drawBox(ctx, boxes[i]);
-
-                ctx.fillStyle = "black"; // Color del texto
-                ctx.font = "16px Arial"; // Tamaño y fuente del texto
-                ctx.fillText(`${label}: ${score}`, xmin, ymin - 5);
+                drawBox(ctx, boxes[i], label, score);
               }
             }
           }
@@ -59,10 +138,31 @@ const ViewImage: FC<viewImageProps> = ({
       };
       reader.readAsDataURL(image!);
     }
-  }, [boxes, labels, scores, image, threshold]);
+  }, [boxes, image, labels, scores, threshold]);
 
   return (
     <>
+      <Modal isOpen={modalIsOpen}>
+        <div className="flex flex-row justify-between px-4 ">
+          <h2 className="text-center w-full">Detalle</h2>
+          <button onClick={closeModal}>Cerrar</button>
+        </div>
+
+        <div className="w-full px-4 flex flex-col gap-5">
+          <div>
+            <h2>etiqueta: {dataModal.label}</h2>
+            <h2>score: {dataModal.score}</h2>
+            <h2>valor: Coming Soon!!!!!</h2>
+            <h2>ancho: {dataModal.width}</h2>
+          </div>
+
+          <img
+            src={dataModal.image}
+            width={dataModal.width - (dataModal.width * 20) / 100}
+            alt="image"
+          />
+        </div>
+      </Modal>
       <div className="container max-w-4xl flex flex-col gap-5">
         <canvas
           className="w-full border rounded-md border-gray-800"
